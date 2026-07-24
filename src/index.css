@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #F5F1E8;
+  color: #2C3E50;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8B6F47;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C41E3A;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-azhar-red text-white rounded-lg font-semibold hover:bg-azhar-dark transition-all duration-300 shadow-lg hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 border-2 border-azhar-red text-azhar-red rounded-lg font-semibold hover:bg-azhar-red hover:text-white transition-all duration-300;
+}
+
+.section-title {
+  @apply text-4xl font-bold text-azhar-dark mb-12 text-center;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #C41E3A, #8B6F47);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-2xl hover:scale-105;
+}
+
+.smooth-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
