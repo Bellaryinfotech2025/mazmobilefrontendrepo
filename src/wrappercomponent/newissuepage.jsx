@@ -21,6 +21,8 @@ const NewEntryIssue = ({ onShowToast }) => {
   const [modelSearch, setModelSearch] = useState("")
   const [showBrandDropdown, setShowBrandDropdown] = useState(false)
   const [showModelDropdown, setShowModelDropdown] = useState(false)
+  const [useCustomBrand, setUseCustomBrand] = useState(false)
+  const [useCustomModel, setUseCustomModel] = useState(false)
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,7 +35,6 @@ const NewEntryIssue = ({ onShowToast }) => {
     customIssue: "",
   })
 
-  // Comprehensive Mobile Brands & Models Database
   const mobileBrands = {
     Apple: ["iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15", "iPhone 15 Plus", "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14", "iPhone 14 Plus", "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 13 mini", "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 mini", "iPhone SE 3", "iPhone SE 2"],
     Samsung: ["Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy Z Fold 5", "Galaxy Z Flip 5", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy A54", "Galaxy A53", "Galaxy M53", "Galaxy M33", "Galaxy Note 20", "Galaxy S21", "Galaxy A72", "Galaxy A52", "Galaxy A32"],
@@ -46,7 +47,6 @@ const NewEntryIssue = ({ onShowToast }) => {
     Google: ["Pixel 8 Pro", "Pixel 8", "Pixel 7a", "Pixel 7 Pro", "Pixel 7", "Pixel 6 Pro", "Pixel 6", "Pixel 6a", "Pixel 5a", "Pixel 4a XL", "Pixel 4a", "Pixel 4"],
     Huawei: ["Huawei P60 Pro", "Huawei Mate 50 Pro", "Huawei Mate 50", "Huawei Nova 10 Pro", "Huawei Nova 10", "Huawei P50 Pro", "Huawei P50", "Huawei Mate 40 Pro", "Huawei Mate 40", "Huawei P40 Pro"],
     Nokia: ["Nokia G60", "Nokia G50", "Nokia X30", "Nokia X20", "Nokia G100", "Nokia 3.4", "Nokia 2.4", "Nokia 6.3", "Nokia 8.3"],
-    Samsung_Budget: ["Samsung Galaxy A23", "Samsung Galaxy A13", "Samsung Galaxy A12", "Samsung Galaxy M12", "Samsung Galaxy M11", "Samsung Galaxy F12"],
     Asus: ["Asus ROG Phone 7 Pro", "Asus ROG Phone 7", "Asus ROG Phone 6D", "Asus ROG Phone 6", "Asus Zenfone 10", "Asus Zenfone 9"],
     Nothing: ["Nothing Phone 2", "Nothing Phone 1"],
     Blackberry: ["BlackBerry KEY2", "BlackBerry KEYone", "BlackBerry PRIV", "BlackBerry Passport"],
@@ -55,45 +55,30 @@ const NewEntryIssue = ({ onShowToast }) => {
   }
 
   const issueTypes = [
-    "Screen Issue",
-    "Battery Issue",
-    "Charging Issue",
-    "Speaker Issue",
-    "Camera Issue",
-    "Software Issue",
-    "Hardware Damage",
-    "Overheating",
-    "Water Damage",
-    "Microphone Issue",
-    "Power Button Issue",
-    "Volume Button Issue",
-    "Screen Replacement",
-    "Battery Replacement",
-    "Motherboard Issue"
+    "Screen Issue", "Battery Issue", "Charging Issue", "Speaker Issue", "Camera Issue",
+    "Software Issue", "Hardware Damage", "Overheating", "Water Damage", "Microphone Issue",
+    "Power Button Issue", "Volume Button Issue", "Screen Replacement", "Battery Replacement", "Motherboard Issue"
   ]
 
-  // Filter brands based on search
   const filteredBrands = useMemo(() => {
     return Object.keys(mobileBrands).filter(brand =>
       brand.toLowerCase().includes(brandSearch.toLowerCase())
     )
   }, [brandSearch])
 
-  // Filter models based on search
   const filteredModels = useMemo(() => {
-    if (!formData.mobileBrand) return []
+    if (!formData.mobileBrand || useCustomBrand) return []
     return mobileBrands[formData.mobileBrand].filter(model =>
       model.toLowerCase().includes(modelSearch.toLowerCase())
     )
-  }, [formData.mobileBrand, modelSearch])
+  }, [formData.mobileBrand, modelSearch, useCustomBrand])
 
   const validateForm = () => {
     const newErrors = {}
     if (!formData.name.trim()) newErrors.name = "Name required"
-    if (!formData.email.trim()) newErrors.email = "Email required"
-    else if (!formData.email.endsWith("@gmail.com")) newErrors.email = "Must be @gmail.com"
     if (!formData.phone.trim()) newErrors.phone = "Phone required"
     else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "10 digits required"
+    if (formData.email.trim() && !formData.email.endsWith("@gmail.com")) newErrors.email = "Must be @gmail.com"
     if (!formData.address.trim()) newErrors.address = "Address required"
     if (!formData.mobileBrand) newErrors.mobileBrand = "Brand required"
     if (!formData.mobileModel) newErrors.mobileModel = "Model required"
@@ -131,7 +116,7 @@ const NewEntryIssue = ({ onShowToast }) => {
       setTrackingId(response.data.trackingId)
       setShowModal(false)
       setShowSuccessModal(true)
-      onShowToast("✅ Issue registered successfully", "success")
+      onShowToast("✅ Issue registered & Tracking ID sent via WhatsApp", "success")
     } catch (error) {
       onShowToast("Error submitting issue", "error")
     } finally {
@@ -149,18 +134,15 @@ const NewEntryIssue = ({ onShowToast }) => {
         + Create Issue
       </button>
 
-      {/* Modal Overlay - Wider & Compressed */}
       {showModal && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={() => setShowModal(false)}
         >
-          {/* Form Modal - Compressed Width */}
           <div
             className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header - Compact */}
             <div className="sticky top-0 bg-gradient-to-r from-azhar-dark to-azhar-brown text-white p-3 sm:p-4 flex items-center justify-between border-b border-gray-200">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold">Create Repair Issue</h2>
@@ -168,16 +150,15 @@ const NewEntryIssue = ({ onShowToast }) => {
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1.5 hover:bg-white/20 rounded-lg transition-all"
+                className="p-1 hover:bg-white/20 rounded-lg transition-all"
               >
                 <IoClose size={20} />
               </button>
             </div>
 
-            {/* Form Content - Compressed Grid */}
-            <form onSubmit={handleSubmit} className="p-3 sm:p-5 space-y-3">
-              {/* Row 1: Name & Email */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <form onSubmit={handleSubmit} className="p-3 sm:p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Row 1: Name */}
                 <div>
                   <label className="block text-xs font-bold text-azhar-dark mb-1">Name *</label>
                   <input
@@ -185,7 +166,7 @@ const NewEntryIssue = ({ onShowToast }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="Your name"
+                    placeholder="Your full name"
                     className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
                       errors.name ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
                     }`}
@@ -193,8 +174,9 @@ const NewEntryIssue = ({ onShowToast }) => {
                   {errors.name && <p className="text-red-500 text-[10px] mt-0.5">{errors.name}</p>}
                 </div>
 
+                {/* Row 2: Email (Optional) */}
                 <div>
-                  <label className="block text-xs font-bold text-azhar-dark mb-1">Email *</label>
+                  <label className="block text-xs font-bold text-azhar-dark mb-1">Email (Optional)</label>
                   <input
                     type="email"
                     name="email"
@@ -207,26 +189,26 @@ const NewEntryIssue = ({ onShowToast }) => {
                   />
                   {errors.email && <p className="text-red-500 text-[10px] mt-0.5">{errors.email}</p>}
                 </div>
-              </div>
 
-              {/* Row 2: Phone & Address */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Row 3: Phone */}
                 <div>
-                  <label className="block text-xs font-bold text-azhar-dark mb-1">Phone *</label>
+                  <label className="block text-xs font-bold text-azhar-dark mb-1">Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="10-digit"
+                    placeholder="10-digit mobile number"
                     maxLength="10"
                     className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
                       errors.phone ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
                     }`}
                   />
                   {errors.phone && <p className="text-red-500 text-[10px] mt-0.5">{errors.phone}</p>}
+                  <p className="text-[10px] text-green-600 font-semibold mt-1">✓ Tracking ID will be sent here via WhatsApp</p>
                 </div>
 
+                {/* Row 4: Address */}
                 <div>
                   <label className="block text-xs font-bold text-azhar-dark mb-1">Address *</label>
                   <input
@@ -234,142 +216,176 @@ const NewEntryIssue = ({ onShowToast }) => {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    placeholder="Full address"
+                    placeholder="Pickup location"
                     className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
                       errors.address ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
                     }`}
                   />
                   {errors.address && <p className="text-red-500 text-[10px] mt-0.5">{errors.address}</p>}
                 </div>
-              </div>
 
-              {/* Row 3: Brand Search */}
-              <div>
-                <label className="block text-xs font-bold text-azhar-dark mb-1">Brand * ({filteredBrands.length})</label>
-                <div className="relative">
-                  <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg px-3 py-2 focus-within:border-azhar-red transition-all">
-                    <MdSearch size={16} className="text-gray-400" />
+                {/* Row 5: Mobile Brand */}
+                <div>
+                  <label className="block text-xs font-bold text-azhar-dark mb-1">
+                    Mobile Brand * 
+                    <button
+                      type="button"
+                      onClick={() => { setUseCustomBrand(!useCustomBrand); setFormData(prev => ({ ...prev, mobileBrand: "" })) }}
+                      className="ml-2 text-[10px] text-azhar-red font-semibold hover:underline"
+                    >
+                      {useCustomBrand ? "Select from list" : "Enter custom"}
+                    </button>
+                  </label>
+                  
+                  {useCustomBrand ? (
                     <input
                       type="text"
-                      placeholder="Search brand..."
-                      value={brandSearch}
-                      onChange={(e) => {
-                        setBrandSearch(e.target.value)
-                        setShowBrandDropdown(true)
-                      }}
-                      onFocus={() => setShowBrandDropdown(true)}
-                      className="flex-1 outline-none text-xs bg-transparent"
+                      name="mobileBrand"
+                      value={formData.mobileBrand}
+                      onChange={handleInputChange}
+                      placeholder="E.g., Nokia, Nothing, Vivo..."
+                      className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
+                        errors.mobileBrand ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
+                      }`}
                     />
-                  </div>
-
-                  {showBrandDropdown && (
-                    <div className="absolute top-full left-0 right-0 bg-white border-2 border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-10 shadow-lg">
-                      {filteredBrands.length > 0 ? (
-                        filteredBrands.map(brand => (
-                          <button
-                            key={brand}
-                            type="button"
-                            onClick={() => {
-                              setFormData(prev => ({ ...prev, mobileBrand: brand, mobileModel: "" }))
-                              setBrandSearch("")
-                              setModelSearch("")
-                              setShowBrandDropdown(false)
-                              if (errors.mobileBrand) setErrors(prev => ({ ...prev, mobileBrand: "" }))
-                            }}
-                            className="w-full text-left px-3 py-2 hover:bg-azhar-red/10 text-xs font-semibold text-azhar-dark transition-all"
-                          >
-                            {brand}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="px-3 py-2 text-xs text-gray-500">No brands found</p>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={brandSearch}
+                        onChange={(e) => { setBrandSearch(e.target.value); setShowBrandDropdown(true) }}
+                        onFocus={() => setShowBrandDropdown(true)}
+                        placeholder="Search or select brand"
+                        className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
+                          errors.mobileBrand ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
+                        }`}
+                      />
+                      {showBrandDropdown && (
+                        <div className="absolute top-full left-0 right-0 bg-white border-2 border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-10">
+                          {filteredBrands.length > 0 ? (
+                            filteredBrands.map(brand => (
+                              <button
+                                key={brand}
+                                type="button"
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, mobileBrand: brand, mobileModel: "" }))
+                                  setBrandSearch(brand)
+                                  setShowBrandDropdown(false)
+                                  setModelSearch("")
+                                  if (errors.mobileBrand) setErrors(prev => ({ ...prev, mobileBrand: "" }))
+                                }}
+                                className="w-full text-left px-3 py-2 hover:bg-azhar-red/10 text-xs font-semibold text-azhar-dark transition-all"
+                              >
+                                {brand}
+                              </button>
+                            ))
+                          ) : (
+                            <p className="px-3 py-2 text-xs text-gray-500">No brands found</p>
+                          )}
+                        </div>
+                      )}
+                      {formData.mobileBrand && (
+                        <div className="absolute right-3 top-2.5 bg-green-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
+                          ✓ {formData.mobileBrand}
+                        </div>
                       )}
                     </div>
                   )}
-
-                  {formData.mobileBrand && (
-                    <div className="absolute right-3 top-2.5 bg-azhar-red text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
-                      {formData.mobileBrand}
-                    </div>
-                  )}
+                  {errors.mobileBrand && <p className="text-red-500 text-[10px] mt-0.5">{errors.mobileBrand}</p>}
                 </div>
-                {errors.mobileBrand && <p className="text-red-500 text-[10px] mt-0.5">{errors.mobileBrand}</p>}
-              </div>
 
-              {/* Row 4: Model Search */}
-              {formData.mobileBrand && (
-                <div>
-                  <label className="block text-xs font-bold text-azhar-dark mb-1">Model * ({filteredModels.length})</label>
-                  <div className="relative">
-                    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-lg px-3 py-2 focus-within:border-azhar-red transition-all">
-                      <MdSearch size={16} className="text-gray-400" />
+                {/* Row 6: Mobile Model */}
+                {formData.mobileBrand && (
+                  <div>
+                    <label className="block text-xs font-bold text-azhar-dark mb-1">
+                      Mobile Model *
+                      <button
+                        type="button"
+                        onClick={() => { setUseCustomModel(!useCustomModel); setFormData(prev => ({ ...prev, mobileModel: "" })) }}
+                        className="ml-2 text-[10px] text-azhar-red font-semibold hover:underline"
+                      >
+                        {useCustomModel ? "Select from list" : "Enter custom"}
+                      </button>
+                    </label>
+
+                    {useCustomModel ? (
                       <input
                         type="text"
-                        placeholder="Search model..."
-                        value={modelSearch}
-                        onChange={(e) => {
-                          setModelSearch(e.target.value)
-                          setShowModelDropdown(true)
-                        }}
-                        onFocus={() => setShowModelDropdown(true)}
-                        className="flex-1 outline-none text-xs bg-transparent"
+                        name="mobileModel"
+                        value={formData.mobileModel}
+                        onChange={handleInputChange}
+                        placeholder="E.g., Galaxy S24, iPhone 15 Pro..."
+                        className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
+                          errors.mobileModel ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
+                        }`}
                       />
-                    </div>
-
-                    {showModelDropdown && (
-                      <div className="absolute top-full left-0 right-0 bg-white border-2 border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-10 shadow-lg">
-                        {filteredModels.length > 0 ? (
-                          filteredModels.map(model => (
-                            <button
-                              key={model}
-                              type="button"
-                              onClick={() => {
-                                setFormData(prev => ({ ...prev, mobileModel: model }))
-                                setModelSearch("")
-                                setShowModelDropdown(false)
-                                if (errors.mobileModel) setErrors(prev => ({ ...prev, mobileModel: "" }))
-                              }}
-                              className="w-full text-left px-3 py-2 hover:bg-azhar-red/10 text-xs font-semibold text-azhar-dark transition-all"
-                            >
-                              {model}
-                            </button>
-                          ))
-                        ) : (
-                          <p className="px-3 py-2 text-xs text-gray-500">No models found</p>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={modelSearch}
+                          onChange={(e) => { setModelSearch(e.target.value); setShowModelDropdown(true) }}
+                          onFocus={() => setShowModelDropdown(true)}
+                          placeholder="Search or select model"
+                          className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
+                            errors.mobileModel ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
+                          }`}
+                        />
+                        {showModelDropdown && (
+                          <div className="absolute top-full left-0 right-0 bg-white border-2 border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto z-10">
+                            {filteredModels.length > 0 ? (
+                              filteredModels.map(model => (
+                                <button
+                                  key={model}
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData(prev => ({ ...prev, mobileModel: model }))
+                                    setModelSearch("")
+                                    setShowModelDropdown(false)
+                                    if (errors.mobileModel) setErrors(prev => ({ ...prev, mobileModel: "" }))
+                                  }}
+                                  className="w-full text-left px-3 py-2 hover:bg-azhar-red/10 text-xs font-semibold text-azhar-dark transition-all"
+                                >
+                                  {model}
+                                </button>
+                              ))
+                            ) : (
+                              <p className="px-3 py-2 text-xs text-gray-500">No models found</p>
+                            )}
+                          </div>
+                        )}
+                        {formData.mobileModel && (
+                          <div className="absolute right-3 top-2.5 bg-green-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            ✓ {formData.mobileModel.substring(0, 15)}...
+                          </div>
                         )}
                       </div>
                     )}
-
-                    {formData.mobileModel && (
-                      <div className="absolute right-3 top-2.5 bg-green-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
-                        ✓ {formData.mobileModel.substring(0, 15)}...
-                      </div>
-                    )}
+                    {errors.mobileModel && <p className="text-red-500 text-[10px] mt-0.5">{errors.mobileModel}</p>}
                   </div>
-                  {errors.mobileModel && <p className="text-red-500 text-[10px] mt-0.5">{errors.mobileModel}</p>}
-                </div>
-              )}
+                )}
 
-              {/* Row 5: Issue Type */}
-              <div>
-                <label className="block text-xs font-bold text-azhar-dark mb-1">Issue Type *</label>
-                <select
-                  name="issueType"
-                  value={formData.issueType}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
-                    errors.issueType ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
-                  }`}
-                >
-                  <option value="">Select Issue Type</option>
-                  {issueTypes.map(issue => (
-                    <option key={issue} value={issue}>{issue}</option>
-                  ))}
-                </select>
-                {errors.issueType && <p className="text-red-500 text-[10px] mt-0.5">{errors.issueType}</p>}
+                {/* Row 7: Issue Type */}
+                <div>
+                  <label className="block text-xs font-bold text-azhar-dark mb-1">Issue Type *</label>
+                  <select
+                    name="issueType"
+                    value={formData.issueType}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border-2 rounded-lg focus:outline-none transition-all text-xs ${
+                      errors.issueType ? "border-red-500 bg-red-50" : "border-gray-300 focus:border-azhar-red"
+                    }`}
+                  >
+                    <option value="">Select Issue Type</option>
+                    {issueTypes.map(issue => (
+                      <option key={issue} value={issue}>{issue}</option>
+                    ))}
+                  </select>
+                  {errors.issueType && <p className="text-red-500 text-[10px] mt-0.5">{errors.issueType}</p>}
+                </div>
               </div>
 
-              {/* Row 6: Custom Issue Checkbox & Description */}
+              {/* Custom Issue */}
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -431,7 +447,7 @@ const NewEntryIssue = ({ onShowToast }) => {
         </div>
       )}
 
-      {/* Success Modal - Compact */}
+      {/* Success Modal */}
       {showSuccessModal && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -457,9 +473,12 @@ const NewEntryIssue = ({ onShowToast }) => {
             <h2 className="text-xl sm:text-2xl font-bold text-azhar-dark mb-1">Success!</h2>
             <p className="text-xs sm:text-sm text-gray-600 mb-4">Your issue has been registered</p>
 
-            <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-3 mb-4">
-              <p className="text-[10px] text-gray-600 font-semibold mb-1.5">Tracking ID</p>
-              <p className="text-lg sm:text-xl font-bold text-azhar-dark mb-2.5 font-mono">{trackingId}</p>
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200 rounded-lg p-4 mb-4">
+              <p className="text-[10px] text-gray-600 font-semibold mb-2">✓ Tracking ID Sent via WhatsApp</p>
+              <p className="text-lg sm:text-xl font-bold text-azhar-dark mb-3 font-mono">{trackingId}</p>
+              <p className="text-[10px] text-green-700 font-semibold mb-3">
+                🟢 Tracking ID has been sent to your WhatsApp number
+              </p>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(trackingId)
@@ -472,7 +491,7 @@ const NewEntryIssue = ({ onShowToast }) => {
               </button>
             </div>
 
-            <p className="text-xs text-gray-600 mb-4">Our team will contact you within 2 hours</p>
+            <p className="text-xs text-gray-600 mb-4">Our team will contact you within 2 hours via WhatsApp or Phone</p>
 
             <button
               onClick={() => {
@@ -481,6 +500,8 @@ const NewEntryIssue = ({ onShowToast }) => {
                 setErrors({})
                 setBrandSearch("")
                 setModelSearch("")
+                setUseCustomBrand(false)
+                setUseCustomModel(false)
               }}
               className="w-full px-3 py-2 bg-azhar-red text-white font-bold rounded-lg hover:bg-azhar-dark transition-all text-xs sm:text-sm"
             >
