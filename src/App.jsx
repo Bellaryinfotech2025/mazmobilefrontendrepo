@@ -8,6 +8,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import SelectionWrapper from './wrappercomponent/SelectionWrapper';
+import ServiceRequestsPortal from './portalcomponent/ServiceRequestsPortal'; 
 
 function App() {
   const [toasts, setToasts] = useState([]);
@@ -55,6 +56,7 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/createrequest" element={<SelectionWrapper onShowToast={onShowToast} />} />
+            <Route path="/portalmanagement" element={<ServiceRequestsPortal />} /> {/* Add this route */}
           </Routes>
         </main>
 
