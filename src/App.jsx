@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
+import PrivacyPolicy from './policyandtermscomponent/privacypolicy';
+import TermsConditions from './policyandtermscomponent/termsconditions';
 import SelectionWrapper from './wrappercomponent/SelectionWrapper';
 import ServiceRequestsPortal from './portalcomponent/ServiceRequestsPortal'; 
 
@@ -56,7 +58,9 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/createrequest" element={<SelectionWrapper onShowToast={onShowToast} />} />
-            <Route path="/portalmanagement" element={<ServiceRequestsPortal />} /> {/* Add this route */}
+            <Route path="/portalmanagement" element={<ServiceRequestsPortal />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/termsconditions" element={<TermsConditions />} />
           </Routes>
         </main>
 
